@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package javafxworkshop_06;
+package sequencedownloader;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -15,7 +15,7 @@ import javafx.stage.Stage;
  *
  * @author mhrimaz
  */
-public class JavaFXWorkshop_06 extends Application {
+public class SequenceDownloader extends Application {
     
     @Override
     public void start(Stage stage) throws Exception {

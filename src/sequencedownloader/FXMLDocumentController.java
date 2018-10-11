@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package javafxworkshop_06;
+package sequencedownloader;
 
 import java.net.MalformedURLException;
 import java.net.URL;
