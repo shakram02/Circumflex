@@ -5,26 +5,26 @@
  */
 package sequencedownloader;
 
+import javafx.concurrent.Task;
+
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
-import javafx.concurrent.Task;
 
 /**
- *
  * @author mhrimaz
  */
 public class Downloader extends Task<Void> {
 
     private URL url;
     private String fileName;
+    private int fileSize;
 
     /**
-     *
-     * @param url URL of file to download
+     * @param url      URL of file to download
      * @param fileName name of the file for saving
      */
     public Downloader(URL url, String fileName) {
@@ -37,7 +37,7 @@ public class Downloader extends Task<Void> {
         try {
             //Code to download
             URLConnection openConnection = url.openConnection();
-            int fileSize = openConnection.getContentLength();
+            fileSize = openConnection.getContentLength();
 
             ByteArrayOutputStream out;
             try (InputStream in = new BufferedInputStream(url.openStream())) {
@@ -49,9 +49,10 @@ public class Downloader extends Task<Void> {
                     downloaded += n;
                     out.write(buf, 0, n);
                     updateProgress(downloaded, fileSize);
-                    updateMessage("Downloaded : " + (downloaded / (1024F*1024F*8F)) +" MB");
+                    updateMessage("Downloaded : " + (downloaded / (1024F * 1024F * 8F)) + " MB");
                 }
                 out.close();
+                System.err.println(String.format("[Download] Complete %s from %s", fileName, url.getPath()));
             }
 
             byte[] response = out.toByteArray();
@@ -60,7 +61,9 @@ public class Downloader extends Task<Void> {
                 //End download code
             }
         } catch (Exception e) {
-
+            System.err.println(String.format("[Download] Failed %s from %s", fileName, url.getPath()));
+            updateProgress(0, fileSize);
+            updateMessage("Download failed: " + e.getMessage());
         }
         return null;
     }
