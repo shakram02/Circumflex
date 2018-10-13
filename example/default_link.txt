@@ -1,0 +1,1 @@
+http://cdn.cs50.net/2017/fall/lectures/^/lecture^.pdf

@@ -11,7 +11,7 @@
 
 <VBox minHeight="200.0" minWidth="350.0" spacing="12.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sequencedownloader.FXMLDocumentController">
    <children>
-      <HBox spacing="12.0" VBox.vgrow="ALWAYS">
+      <HBox alignment="CENTER_LEFT" spacing="12.0" VBox.vgrow="ALWAYS">
          <children>
             <Label text="File URL" />
             <TextField fx:id="urlField" HBox.hgrow="ALWAYS" />
@@ -34,7 +34,7 @@
          <children>
             <Button mnemonicParsing="false" onAction="#loadTemplateParams" text="Load" />
             <Pane HBox.hgrow="ALWAYS" />
-            <Button mnemonicParsing="false" onAction="#handleDownloadAction" text="Download" />
+            <Button fx:id="downloadButton" mnemonicParsing="false" onAction="#handleDownloadAction" text="Download" />
          </children>
       </HBox>
    </children>
