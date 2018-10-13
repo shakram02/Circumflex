@@ -19,14 +19,15 @@ class MultiDownloader(private val urls: List<URL>, private var directoryPath: Fi
     private val lock = Object()
     private val executor = Executors.newSingleThreadExecutor(DaemonThreadFactory(this))
     private val decimalFormat = DecimalFormat("#.##")
+    private var completed = 0
 
     init {
         decimalFormat.roundingMode = RoundingMode.CEILING
     }
 
     override fun call(): Void? = synchronized(lock) {
-        for (url in urls) {
-
+        updateMessage("Downloading...")
+        urls.forEachIndexed { index, url ->
             val filePath = File(directoryPath, url.getFileName()).absolutePath
             val downloader = Downloader(url, filePath)
             // TODO bind the progress bar to this downloader
@@ -39,6 +40,7 @@ class MultiDownloader(private val urls: List<URL>, private var directoryPath: Fi
 
             executor.submit(downloader)
             lock.wait() // Wait until download completes
+            completed = index + 1
         }
 
         succeeded()
@@ -46,7 +48,7 @@ class MultiDownloader(private val urls: List<URL>, private var directoryPath: Fi
     }
 
     private val onWorkerChangeProgress = ChangeListener<Number> { _, _, new ->
-        updateProgress(new.toPercentage(), 100.0)
+        updateProgress(new.toDouble(), 1.0)
     }
 
     private val onDownloaderStateChange = EventHandler<WorkerStateEvent> {
@@ -57,9 +59,14 @@ class MultiDownloader(private val urls: List<URL>, private var directoryPath: Fi
         synchronized(lock) {
             // Awake the waiting threads on termination
             when (stateEvent) {
+                WorkerStateEvent.WORKER_STATE_RUNNING -> updateProgress(-1.0, 0.0)
                 WorkerStateEvent.WORKER_STATE_CANCELLED -> lock.notifyAll()
                 WorkerStateEvent.WORKER_STATE_FAILED -> lock.notifyAll()
-                WorkerStateEvent.WORKER_STATE_SUCCEEDED -> lock.notifyAll()
+                WorkerStateEvent.WORKER_STATE_SUCCEEDED -> {
+                    updateMessage("Download: ${completed + 1} / ${urls.count()}")
+                    updateProgress(1.0, 1.0)
+                    lock.notifyAll()
+                }
             }
         }
     }
