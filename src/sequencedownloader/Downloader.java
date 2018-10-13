@@ -52,6 +52,7 @@ public class Downloader extends Task<Void> {
                     updateMessage("Downloaded : " + (downloaded / (1024F * 1024F * 8F)) + " MB");
                 }
                 out.close();
+
                 System.err.println(String.format("[Download] Complete %s from %s", fileName, url.getPath()));
             }
 
@@ -60,11 +61,15 @@ public class Downloader extends Task<Void> {
                 fos.write(response);
                 //End download code
             }
+
+            this.succeeded();
         } catch (Exception e) {
             System.err.println(String.format("[Download] Failed %s from %s", fileName, url.getPath()));
             updateProgress(0, fileSize);
             updateMessage("Download failed: " + e.getMessage());
+            this.failed();
         }
+
         return null;
     }
 

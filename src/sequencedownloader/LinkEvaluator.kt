@@ -12,7 +12,7 @@ class LinkEvaluator private constructor() {
                         "of entries in each substitution line is equal to the number of \"^\" in the link")
             }
 
-            val result = mutableListOf<String>()
+            val results = mutableListOf<URL>()
 
             for (substitutionLine in substitutions) {
                 // Replace the mark char with its substitution
@@ -20,9 +20,11 @@ class LinkEvaluator private constructor() {
                         .split(" ", "\t")
                         .map { it.trim().replace("\n", "") }
 
-                result.add(replaceMultiple(url, subs, replacementChar))
+                val urlString = replaceMultiple(url, subs, replacementChar)
+                results.add(URL(urlString))
             }
-            return listOf()
+
+            return results
         }
 
         /**
