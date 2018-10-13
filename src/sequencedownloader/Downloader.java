@@ -21,7 +21,7 @@ public class Downloader extends Task<Void> {
 
     private URL url;
     private String fileName;
-    private int fileSize;
+    private long fileSize;
 
     /**
      * @param url      URL of file to download
@@ -37,7 +37,7 @@ public class Downloader extends Task<Void> {
         try {
             //Code to download
             URLConnection openConnection = url.openConnection();
-            fileSize = openConnection.getContentLength();
+            fileSize = openConnection.getContentLengthLong();
 
             ByteArrayOutputStream out;
             try (InputStream in = new BufferedInputStream(url.openStream())) {
@@ -46,6 +46,10 @@ public class Downloader extends Task<Void> {
                 int n = 0;
                 long downloaded = 0;
                 while (-1 != (n = in.read(buf))) {
+                    if (isCancelled()) {
+                        out.close();
+                        return null;
+                    }
                     downloaded += n;
                     out.write(buf, 0, n);
                     updateProgress(downloaded, fileSize);
@@ -64,7 +68,8 @@ public class Downloader extends Task<Void> {
 
             this.succeeded();
         } catch (Exception e) {
-            System.err.println(String.format("[Download] Failed %s from %s", fileName, url.getPath()));
+            System.err.println(String.format("[Download] Failed %s from %s\n%s\n\n", fileName,
+                    url.getPath(), e.getMessage()));
             updateProgress(0, fileSize);
             updateMessage("Download failed: " + e.getMessage());
             this.failed();

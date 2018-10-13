@@ -20,6 +20,7 @@ class MultiDownloader(private val urls: List<URL>, private var directoryPath: Fi
     private val executor = Executors.newSingleThreadExecutor(DaemonThreadFactory(this))
     private val decimalFormat = DecimalFormat("#.##")
     private var completed = 0
+    private lateinit var currentDownloader: Downloader
 
     init {
         decimalFormat.roundingMode = RoundingMode.CEILING
@@ -27,28 +28,42 @@ class MultiDownloader(private val urls: List<URL>, private var directoryPath: Fi
 
     override fun call(): Void? = synchronized(lock) {
         updateMessage("Downloading...")
-        urls.forEachIndexed { index, url ->
-            val filePath = File(directoryPath, url.getFileName()).absolutePath
-            val downloader = Downloader(url, filePath)
-            // TODO bind the progress bar to this downloader
+        for (index in urls.indices) {
+            completed = index
+            val url = urls[index]
+            val file = File(directoryPath, url.getFileName())
 
-            downloader.progressProperty().addListener(onWorkerChangeProgress)
-            downloader.onFailed = onDownloaderStateChange
-            downloader.onCancelled = onDownloaderStateChange
-            downloader.onRunning = onDownloaderStateChange
-            downloader.onSucceeded = onDownloaderStateChange
+            if (isPreviouslyDownloaded(url, file)) {
+                updateMessage("Already downloaded: ${file.name}" +
+                        "\nDownload: ${completed + 1} / ${urls.count()}")
+                updateProgress(1.0, 1.0)
+                Thread.sleep(SLEEP_PERIOD)
+                continue
+            }
 
-            executor.submit(downloader)
+            currentDownloader = Downloader(url, file.absolutePath)
+            currentDownloader.progressProperty().addListener(onWorkerChangeProgress)
+            currentDownloader.onFailed = onDownloaderStateChange
+            currentDownloader.onCancelled = onDownloaderStateChange
+            currentDownloader.onRunning = onDownloaderStateChange
+            currentDownloader.onSucceeded = onDownloaderStateChange
+
+            executor.submit(currentDownloader)
             lock.wait() // Wait until download completes
-            completed = index + 1
         }
 
-        succeeded()
         return null
     }
 
     private val onWorkerChangeProgress = ChangeListener<Number> { _, _, new ->
         updateProgress(new.toDouble(), 1.0)
+    }
+
+    override fun cancel(mayInterruptIfRunning: Boolean): Boolean {
+        executor.shutdownNow()
+        currentDownloader.cancel(mayInterruptIfRunning)
+
+        return super.cancel(mayInterruptIfRunning)
     }
 
     private val onDownloaderStateChange = EventHandler<WorkerStateEvent> {
@@ -66,13 +81,31 @@ class MultiDownloader(private val urls: List<URL>, private var directoryPath: Fi
                     updateMessage("Download: ${completed + 1} / ${urls.count()}")
                     updateProgress(1.0, 1.0)
                     lock.notifyAll()
+                    Thread.sleep(SLEEP_PERIOD)
                 }
             }
         }
     }
 
+    private fun isPreviouslyDownloaded(url: URL, downloadDestination: File): Boolean {
+        val openConnection = url.openConnection()
+        val fileSize = openConnection.contentLengthLong
+
+        if (downloadDestination.exists() && downloadDestination.length() == fileSize) {
+            System.err.println("[Download] skip ${downloadDestination.absolutePath}, it's already downloaded")
+            // TODO updateMessage() ?
+            return true
+        }
+
+        return false
+    }
+
     override fun uncaughtException(p0: Thread?, p1: Throwable?) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    companion object {
+        private const val SLEEP_PERIOD = 300L
     }
 }
 

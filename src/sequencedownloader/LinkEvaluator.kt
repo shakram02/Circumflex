@@ -5,6 +5,7 @@ import java.net.URL
 class LinkEvaluator private constructor() {
 
     companion object {
+        @Throws(RuntimeException::class)
         fun evaluateURLs(url: String, substitutions: List<String>, replacementChar: String = "^"): List<URL> {
             if (!verifyInput(url, substitutions, replacementChar)) {
                 throw RuntimeException("Some of the input file entries don't " +
