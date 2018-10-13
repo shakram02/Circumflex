@@ -27,6 +27,8 @@ The input link will look like this
 ```markdown
 http://cdn.cs50.net/2017/fall/lectures/^/lecture^.pdf
 ```
+![link-example](img/link-example.jpg)
+
 This is the subtitution text file (e.g. `subs.txt`)
 
 ```text
@@ -36,6 +38,8 @@ This is the subtitution text file (e.g. `subs.txt`)
 ```
 
 After clicking `Download` the links will be generated and then downloaded.
+
+![downloading](img/download-cs50-example.jpg)
 
 > The `example` directory includes the used files, you can try them directly 
 

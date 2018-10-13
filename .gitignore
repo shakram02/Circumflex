@@ -3,7 +3,7 @@
 
 *.mp3
 *.txt
-!exmaple/
+!example/*
 # User-specific stuff
 .idea/**/workspace.xml
 .idea/**/tasks.xml
