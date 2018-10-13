@@ -21,7 +21,7 @@ public class Downloader extends Task<Void> {
 
     private URL url;
     private String fileName;
-    private int fileSize;
+    private long fileSize;
 
     /**
      * @param url      URL of file to download
@@ -37,7 +37,7 @@ public class Downloader extends Task<Void> {
         try {
             //Code to download
             URLConnection openConnection = url.openConnection();
-            fileSize = openConnection.getContentLength();
+            fileSize = openConnection.getContentLengthLong();
 
             ByteArrayOutputStream out;
             try (InputStream in = new BufferedInputStream(url.openStream())) {
