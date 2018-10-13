@@ -20,6 +20,7 @@ class MultiDownloader(private val urls: List<URL>, private var directoryPath: Fi
     private val executor = Executors.newSingleThreadExecutor(DaemonThreadFactory(this))
     private val decimalFormat = DecimalFormat("#.##")
     private var completed = 0
+    private lateinit var currentDownloader: Downloader
 
     init {
         decimalFormat.roundingMode = RoundingMode.CEILING
@@ -27,28 +28,35 @@ class MultiDownloader(private val urls: List<URL>, private var directoryPath: Fi
 
     override fun call(): Void? = synchronized(lock) {
         updateMessage("Downloading...")
-        urls.forEachIndexed { index, url ->
+        for (index in urls.indices) {
+            val url = urls[index]
             val filePath = File(directoryPath, url.getFileName()).absolutePath
-            val downloader = Downloader(url, filePath)
-            // TODO bind the progress bar to this downloader
 
-            downloader.progressProperty().addListener(onWorkerChangeProgress)
-            downloader.onFailed = onDownloaderStateChange
-            downloader.onCancelled = onDownloaderStateChange
-            downloader.onRunning = onDownloaderStateChange
-            downloader.onSucceeded = onDownloaderStateChange
+            currentDownloader = Downloader(url, filePath)
+            currentDownloader.progressProperty().addListener(onWorkerChangeProgress)
+            currentDownloader.onFailed = onDownloaderStateChange
+            currentDownloader.onCancelled = onDownloaderStateChange
+            currentDownloader.onRunning = onDownloaderStateChange
+            currentDownloader.onSucceeded = onDownloaderStateChange
 
-            executor.submit(downloader)
+            executor.submit(currentDownloader)
             lock.wait() // Wait until download completes
+
             completed = index + 1
         }
 
-        succeeded()
         return null
     }
 
     private val onWorkerChangeProgress = ChangeListener<Number> { _, _, new ->
         updateProgress(new.toDouble(), 1.0)
+    }
+
+    override fun cancel(mayInterruptIfRunning: Boolean): Boolean {
+        executor.shutdownNow()
+        currentDownloader.cancel(mayInterruptIfRunning)
+
+        return super.cancel(mayInterruptIfRunning)
     }
 
     private val onDownloaderStateChange = EventHandler<WorkerStateEvent> {
