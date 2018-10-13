@@ -7,6 +7,7 @@ package sequencedownloader
 
 import javafx.event.ActionEvent
 import javafx.fxml.FXML
+import javafx.fxml.Initializable
 import javafx.scene.control.Label
 import javafx.scene.control.ProgressIndicator
 import javafx.scene.control.TextField
@@ -18,12 +19,14 @@ import java.net.URL
 import java.nio.charset.Charset
 import java.nio.file.Files
 import java.nio.file.Paths
+import java.util.*
 import java.util.concurrent.Executors
 
 /**
  * @author mhrimaz
+ * modified by shakram02
  */
-class FXMLDocumentController : Thread.UncaughtExceptionHandler {
+class FXMLDocumentController : Thread.UncaughtExceptionHandler, Initializable {
 
     @FXML
     private lateinit var status: Label
@@ -36,6 +39,16 @@ class FXMLDocumentController : Thread.UncaughtExceptionHandler {
     private val textFileExtensionFilter = FileChooser.ExtensionFilter("Text Files", "*.txt")
     private var templateValues: List<String>? = null
     private var evaluatedURLs = listOf<URL>()
+
+    override fun initialize(p0: URL?, p1: ResourceBundle?) {
+        val defaultUrlFile = File(DOWNLOAD_LINK_NAME)
+
+        if (!(defaultUrlFile.exists() && defaultUrlFile.canRead())) {
+            return
+        }
+
+        urlField.text = Files.readAllLines(defaultUrlFile.toPath()).first()
+    }
 
     @FXML
     private fun handleDownloadAction(event: ActionEvent) {
@@ -105,6 +118,7 @@ class FXMLDocumentController : Thread.UncaughtExceptionHandler {
     companion object {
         private val executor = Executors.newSingleThreadExecutor(DaemonThreadFactory())
         private const val DOWNLOAD_LIST_NAME = "download_list.txt"
+        private const val DOWNLOAD_LINK_NAME = "default_link.txt"
         private const val DIALOG_TITLE = "Load Template"
         private const val DOWNLOAD_TO_TITLE = "Download to..."
     }
