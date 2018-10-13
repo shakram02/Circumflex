@@ -1,4 +1,4 @@
-# Sequence Downloader
+# Circumflex
 Download file sequences in an easy manner.
 
 It works by substituting a special character in a link (`^`) by a set
