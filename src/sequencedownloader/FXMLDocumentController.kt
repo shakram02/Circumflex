@@ -88,7 +88,15 @@ class FXMLDocumentController : Thread.UncaughtExceptionHandler, Initializable {
         val downloadPath: File
 
         if (templateValues != null) {
-            evaluatedURLs = LinkEvaluator.evaluateURLs(urlField.text, templateValues!!)
+            try {
+                evaluatedURLs = LinkEvaluator.evaluateURLs(urlField.text, templateValues!!)
+
+            } catch (e: RuntimeException) {
+                val alert = Alert(Alert.AlertType.ERROR, e.message, ButtonType.OK)
+                alert.title = "Invalid substitution file"
+                alert.showAndWait()
+                return null
+            }
             System.err.println("[URL Eval] evaluated ${evaluatedURLs.count()} URLs")
 
             val directoryPath = fileSelector.selectSaveDirectory(progress.scene.window,
