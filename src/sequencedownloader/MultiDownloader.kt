@@ -14,17 +14,13 @@ import java.util.concurrent.Executors
  * Represents a facade for download operations. Summons child downloaders for a given
  * list of URLs and monitors their state. Downloads are performed sequentially.
  */
-class MultiDownloader(private val urls: List<URL>, private var directoryPath: String? = "./") : Task<Void>(),
+class MultiDownloader(private val urls: List<URL>, private var directoryPath: File = File("./")) : Task<Void>(),
         Thread.UncaughtExceptionHandler {
     private val lock = Object()
     private val executor = Executors.newSingleThreadExecutor(DaemonThreadFactory(this))
     private val decimalFormat = DecimalFormat("#.##")
 
     init {
-        if (directoryPath.isNullOrEmpty()) {
-            directoryPath = "./"
-        }
-
         decimalFormat.roundingMode = RoundingMode.CEILING
     }
 
