@@ -48,6 +48,9 @@ After clicking `Download` the links will be generated and then downloaded.
 - You can directly download files given a direct link also. (without using templates)
 
 
+### Dependencies
+- JRE 1.8 [here](https://github.com/shakram02/SoundAnnotator/releases/download/v1.0/jre-8u181-windows-x64.exe) or from Oracle website [here](https://www.oracle.com/technetwork/java/javase/downloads/jre8-downloads-2133155.html)
+
 ---
 This project is a fork of [JavaFxWorkshop_06](https://github.com/mhrimaz/JavaFXWorkshop_06)
 
