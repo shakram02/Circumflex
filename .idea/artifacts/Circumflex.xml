@@ -4,7 +4,7 @@
     <properties id="javafx-properties">
       <options>
         <option name="alias" value="" />
-        <option name="appClass" value="sequencedownloader.SequenceDownloader" />
+        <option name="appClass" value="circumflex.Circumflex" />
         <option name="description" value="" />
         <option name="enabledSigning" value="true" />
         <option name="htmlPlaceholderId" value="" />
