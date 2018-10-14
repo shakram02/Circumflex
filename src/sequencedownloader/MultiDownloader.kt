@@ -62,7 +62,7 @@ class MultiDownloader(private val urls: List<URL>, private var directoryPath: Fi
     override fun cancel(mayInterruptIfRunning: Boolean): Boolean {
         executor.shutdownNow()
         currentDownloader.cancel(mayInterruptIfRunning)
-
+        updateProgress(0.0, 1.0)
         return super.cancel(mayInterruptIfRunning)
     }
 

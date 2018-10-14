@@ -14,10 +14,11 @@ import javafx.fxml.Initializable
 import javafx.scene.control.*
 import javafx.stage.FileChooser
 import java.io.File
+import java.io.FileInputStream
 import java.io.IOException
+import java.io.InputStreamReader
 import java.net.URISyntaxException
 import java.net.URL
-import java.nio.charset.Charset
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.util.*
@@ -51,7 +52,16 @@ class FXMLDocumentController : Thread.UncaughtExceptionHandler, Initializable {
             return
         }
 
-        urlField.text = Files.readAllLines(defaultUrlFile.toPath()).first()
+        val fileLines = Files.readAllLines(defaultUrlFile.toPath())
+        if (fileLines.isEmpty()) {
+            return
+        }
+
+        val defaultUrl = fileLines[0]
+        if (defaultUrl.isNullOrEmpty()) {
+            return
+        }
+        urlField.text = defaultUrl
     }
 
     @FXML
@@ -72,10 +82,10 @@ class FXMLDocumentController : Thread.UncaughtExceptionHandler, Initializable {
                 DIALOG_TITLE, textFileExtensionFilter, DOWNLOAD_LIST_NAME) ?: return
 
         try {
-            templateValues = Files.readAllLines(Paths.get(filePath.absolutePath), Charset.defaultCharset())
+            val file = Paths.get(filePath.absolutePath)
+            templateValues = Files.readAllLines(file)
         } catch (e: IOException) {
-            System.err.println(e.localizedMessage)
-            return
+            System.err.println("[Open] Failed to read value file \n${e.localizedMessage}")
         }
     }
 
