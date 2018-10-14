@@ -1,4 +1,4 @@
-package sequencedownloader
+package circumflex
 
 import javafx.beans.value.ChangeListener
 import javafx.concurrent.Task

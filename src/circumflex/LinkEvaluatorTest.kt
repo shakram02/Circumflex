@@ -1,4 +1,4 @@
-package sequencedownloader
+package circumflex
 
 import org.junit.Test
 import java.net.URL

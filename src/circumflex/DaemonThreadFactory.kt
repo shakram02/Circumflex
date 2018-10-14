@@ -1,4 +1,4 @@
-package sequencedownloader
+package circumflex
 
 import java.util.concurrent.ThreadFactory
 

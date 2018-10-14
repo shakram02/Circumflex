@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package sequencedownloader
+package circumflex
 
 import javafx.application.Platform
 import javafx.concurrent.WorkerStateEvent
@@ -14,9 +14,7 @@ import javafx.fxml.Initializable
 import javafx.scene.control.*
 import javafx.stage.FileChooser
 import java.io.File
-import java.io.FileInputStream
 import java.io.IOException
-import java.io.InputStreamReader
 import java.net.URISyntaxException
 import java.net.URL
 import java.nio.file.Files

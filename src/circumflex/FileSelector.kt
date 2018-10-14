@@ -1,4 +1,4 @@
-package sequencedownloader
+package circumflex
 
 import javafx.stage.DirectoryChooser
 import javafx.stage.FileChooser
